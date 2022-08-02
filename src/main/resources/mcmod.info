@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "universalchat",
+    "name": "Universal Chat",
+    "description": "Connect to a vast chat network reaching reaching many veterans players.",
+    "version": "1.0",
+    "mcversion": "1.8.9",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "aidn5"
+    ],
+    "credits": "Idea inspired from Guild Bridge Finited",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
