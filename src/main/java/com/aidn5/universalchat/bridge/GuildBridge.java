@@ -2,6 +2,7 @@ package com.aidn5.universalchat.bridge;
 
 import com.aidn5.universalchat.UniversalChat;
 import com.aidn5.universalchat.server.packets.Message;
+import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -12,18 +13,19 @@ import java.util.regex.Pattern;
 
 public class GuildBridge {
     private static final Pattern PUBLIC_CHAT = Pattern.compile("^Guild > (?:\\[[A-Z+]{1,10}\\] ){0,3}(\\w{3,32})(?: \\[\\w{1,10}\\]){0,3}:(.{1,256})");
-    private static final String BRIDGE_INDICATOR = "⋮";
+    private static final String BRIDGE_INDICATOR = ".";
 
     @SubscribeEvent
-    public static void onChat(ClientChatReceivedEvent event) {
+    public void onChat(ClientChatReceivedEvent event) {
         if (event.type != 0) return;
         if (!bridgeEnabled()) return;
 
-        Matcher matcher = PUBLIC_CHAT.matcher(event.message.getUnformattedTextForChat());
+        String chatMessage = ChatFormatting.stripFormatting(event.message.getFormattedText());
+        Matcher matcher = PUBLIC_CHAT.matcher(chatMessage);
         if (!matcher.find()) return;
 
-        String username = matcher.group(1);
-        String message = matcher.group(2);
+        String username = matcher.group(1).trim();
+        String message = matcher.group(2).trim();
 
         if (message.startsWith(BRIDGE_INDICATOR)) return;
 
@@ -40,7 +42,6 @@ public class GuildBridge {
         if (p != null) {
             String username = message.displayName != null ? message.displayName : message.username;
             String finalMessage = "/gc " + BRIDGE_INDICATOR + username + ": " + message.message;
-            System.out.println(finalMessage);
             p.sendChatMessage(finalMessage);
         }
     }
