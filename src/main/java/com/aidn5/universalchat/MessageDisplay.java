@@ -36,7 +36,7 @@ public class MessageDisplay {
             return new ChatComponentText(GOLD + event.username);
         }
 
-        ChatComponentText m = new ChatComponentText(GOLD + "°" + event.displayName);
+        ChatComponentText m = new ChatComponentText(GOLD + "." + event.displayName);
         ChatStyle cs = new ChatStyle();
         m.setChatStyle(cs);
 

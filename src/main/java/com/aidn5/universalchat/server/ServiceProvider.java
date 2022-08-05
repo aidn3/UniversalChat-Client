@@ -16,7 +16,7 @@ public class ServiceProvider {
     @Nullable
     private String receptor;
 
-    public boolean hasBridgePermission = true;
+    public boolean hasBridgePermission = false;
 
     public ServiceProvider(@Nonnull SocketHook socketHook) {
         this.socketHook = Objects.requireNonNull(socketHook);
