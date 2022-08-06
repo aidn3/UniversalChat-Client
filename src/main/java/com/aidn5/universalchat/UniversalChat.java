@@ -1,6 +1,7 @@
 
 package com.aidn5.universalchat;
 
+import com.aidn5.universalchat.bridge.GuildBridge;
 import com.aidn5.universalchat.commands.ChatCommand;
 import com.aidn5.universalchat.commands.MessageCommand;
 import com.aidn5.universalchat.commands.UniversalCommand;
@@ -8,6 +9,7 @@ import com.aidn5.universalchat.config.ConfigInstance;
 import com.aidn5.universalchat.config.ConfigUtil;
 import com.aidn5.universalchat.server.SocketHook;
 import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -38,6 +40,8 @@ public class UniversalChat {
     @EventHandler
     public void init(@Nonnull FMLInitializationEvent event) throws URISyntaxException {
         socketHook = new SocketHook();
+
+        MinecraftForge.EVENT_BUS.register(new GuildBridge());
 
         ClientCommandHandler.instance.registerCommand(new MessageCommand());
         ClientCommandHandler.instance.registerCommand(new ChatCommand());
