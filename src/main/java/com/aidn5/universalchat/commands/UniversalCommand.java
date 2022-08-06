@@ -51,7 +51,68 @@ public class UniversalCommand extends CommandBase {
                 s.addChatMessage(MessageUtil.getErrorSavingSettings());
             }
 
-        } else {
+        }
+
+        else if (args[0].equalsIgnoreCase("ignore") && args[1] != null) {
+            if (!args[1].equalsIgnoreCase("add") && !args[1].equalsIgnoreCase("remove") && !args[1].equalsIgnoreCase("list"))
+                return;
+
+            if (args[1].equalsIgnoreCase("add")) {
+                if (args[2].length() < 2 || args[2].length() > 16) return;
+
+                for (int i = 0; i < UniversalChat.configInstance.ignoreList.size(); i++) {
+                    if (args[2].equalsIgnoreCase(UniversalChat.configInstance.ignoreList.get(i))) {
+                        s.addChatMessage(playerAlreadyInIgnoreList(args[2]));
+                        return;
+                    }
+                }
+
+                try {
+                    System.out.println(UniversalChat.configInstance.ignoreList);
+                    UniversalChat.configInstance.ignoreList.add(args[2]);
+                    UniversalChat.configInstance.save();
+                    s.addChatMessage(ignoreListAdd(args[2]));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    s.addChatMessage(MessageUtil.getErrorSavingSettings());
+                }
+            } else if (args[1].equalsIgnoreCase("remove")) {
+                if (args[2].length() < 2 || args[2].length() > 16) return;
+
+                boolean playerInTheIgnoreList = false;
+                for (int i = 0; i < UniversalChat.configInstance.ignoreList.size(); i++) {
+                    if (!args[2].equalsIgnoreCase(UniversalChat.configInstance.ignoreList.get(i))) {
+                        playerInTheIgnoreList = false;
+                    } else {
+                        playerInTheIgnoreList = true;
+                        break;
+                    }
+                }
+
+                if (!playerInTheIgnoreList) {
+                    s.addChatMessage(playerNotInTheIgnoreList(args[2]));
+                    return;
+                }
+
+                try {
+                    for (int i = 0; i < UniversalChat.configInstance.ignoreList.size(); i++) {
+                        if (args[2].equalsIgnoreCase(UniversalChat.configInstance.ignoreList.get(i))) {
+                            UniversalChat.configInstance.ignoreList.remove(i);
+                            break;
+                        }
+                    }
+                    UniversalChat.configInstance.save();
+                    s.addChatMessage(ignoreListRemove(args[2]));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    s.addChatMessage(MessageUtil.getErrorSavingSettings());
+                }
+            }
+            else if (args[1].equalsIgnoreCase("list")) {
+                s.addChatMessage(displayIgnoreList());
+            }
+        }
+        else {
             s.addChatMessage(new ChatComponentText(RED + getCommandUsage(s)));
         }
     }
@@ -97,6 +158,45 @@ public class UniversalCommand extends CommandBase {
         cs.setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(hoverText)));
 
         return m;
+    }
+
+    private ChatComponentText displayIgnoreList() {
+        String message;
+        if (UniversalChat.configInstance.ignoreList.size() == 0) {
+            return new ChatComponentText("You don't have anybody ignored.");
+        }
+
+        message = "Your ignore list consists of: \n[";
+        for (int i = 0; i < UniversalChat.configInstance.ignoreList.size(); i++) {
+            if (i + 1 == UniversalChat.configInstance.ignoreList.size()) {
+                message += GRAY + UniversalChat.configInstance.ignoreList.get(i) + RESET + "]";
+                return new ChatComponentText(message);
+            } else {
+                message += GRAY + UniversalChat.configInstance.ignoreList.get(i) + ", ";
+            }
+        }
+
+        return new ChatComponentText(message);
+    }
+
+    private ChatComponentText ignoreListAdd(String player) {
+        String message = "Added " + RED + player + RESET + " to the ignore list!";
+        return new ChatComponentText(message);
+    }
+
+    private ChatComponentText ignoreListRemove(String player) {
+        String message = "Removed " + BLUE + player + RESET + " from the ignore list!";
+        return new ChatComponentText(message);
+    }
+
+    private ChatComponentText playerAlreadyInIgnoreList(String player) {
+        String message = RED + player + " is already in the ignore list!";
+        return new ChatComponentText(message);
+    }
+
+    private ChatComponentText playerNotInTheIgnoreList(String player) {
+        String message = RED + player + " is not in the ignore list!";
+        return new ChatComponentText(message);
     }
 
     private ChatComponentText getForceDisableBridge() {

@@ -94,6 +94,16 @@ public class MessageDisplay {
 
     public static void showGlobalMessage(Message event) {
         if (!UniversalChat.configInstance.showGlobalChat) return;
+
+        String player = event.displayName != null ? event.displayName : event.username;
+
+        // Checks if player is in ignore list, if yes doesn't display the message
+       for (int i = 0; i < UniversalChat.configInstance.ignoreList.size(); i++) {
+            if (player.equalsIgnoreCase(UniversalChat.configInstance.ignoreList.get(i))) {
+                return;
+            }
+        }
+
         IChatComponent displayMessage = new ChatComponentText("")
                 .appendSibling(chatPrefix())
                 .appendSibling(displayName(event))
