@@ -40,8 +40,8 @@ public class MessageDisplay {
         ChatStyle cs = new ChatStyle();
         m.setChatStyle(cs);
 
-        String hoverText = event.username + " is sending this message.\n\n"
-                + GRAY + "This message is mostly sent from a guild-bridge";
+        String hoverText = event.username + " is sending this message.\n"
+                + DARK_GRAY + "This message is mostly sent from a guild-bridge";
         cs.setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(hoverText)));
 
         return m;
