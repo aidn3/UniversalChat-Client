@@ -8,9 +8,11 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class SocketHook {
     private static final String SERVER_URL = "wss://chat.aidn5.com";
@@ -45,7 +47,7 @@ public class SocketHook {
 
         socket.on(Socket.EVENT_CONNECT_ERROR, this::onConnectionError);
         socket.on(Socket.EVENT_CONNECT, this::onConnect);
-
+        socket.on(Socket.EVENT_DISCONNECT, this::onDisconnect);
         updateAuth();
         socket.connect();
     }
@@ -71,16 +73,28 @@ public class SocketHook {
         packet.processPacket(this);
     }
 
-    private void onConnect(Object[] payload) {
+    private void onConnect(Object... payload) {
         System.out.println("Socket Connected.");
     }
 
-    private void onConnectionError(Object[] payload) {
+    private void onDisconnect(Object... payload) {
+        System.err.println("Client disconnected from UniversalChat servers\n"
+                + buildErrorFrom(payload));
+
+    }
+
+    private void onConnectionError(Object... payload) {
+        System.err.println("Error connecting to UniversalChat servers\n"
+                + buildErrorFrom(payload));
+
         try {
-            Thread.sleep(TimeUnit.SECONDS.toMillis(3));
+            System.err.println("Sleeping for 3 seconds before retrying");
+            Thread.sleep(TimeUnit.SECONDS.toMillis(10));
 
             updateAuth();
-            socket.connect();
+
+            System.out.println("reconnecting to UniversalChat servers");
+            restartConnection();
 
         } catch (InterruptedException e) {
             System.out.println("socket cool down is interrupted. not connecting anymore.");
@@ -95,5 +109,11 @@ public class SocketHook {
             e.printStackTrace();
             System.err.println("Could not auth with Mojang Session Servers. Connecting anyways...");
         }
+    }
+
+    private static String buildErrorFrom(Object... payload) {
+        return Arrays.stream(payload)
+                .map(String::valueOf)
+                .collect(Collectors.joining());
     }
 }
