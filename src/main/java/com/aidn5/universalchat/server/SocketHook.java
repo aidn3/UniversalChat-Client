@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class SocketHook {
-    private static final String SERVER_URL = "ws://chat.aidn5.com";
+    private static final String SERVER_URL = "wss://chat.aidn5.com";
     private static final Gson GSON = new Gson();
     private static final Set<Class<? extends IPacket>> packets = new HashSet<>();
 
@@ -32,6 +32,7 @@ public class SocketHook {
     public SocketHook() throws URISyntaxException {
         IO.Options options = IO.Options.builder()
                 .setAuth(authServer.authData)
+                .setSecure(true)
                 .build();
 
         socket = IO.socket(SERVER_URL, options);
