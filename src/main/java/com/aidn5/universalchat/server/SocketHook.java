@@ -50,6 +50,11 @@ public class SocketHook {
         socket.connect();
     }
 
+    public void restartConnection() {
+        socket.disconnect();
+        socket.connect();
+    }
+
     public void sendMessage(Message packet) {
         serviceProvider.sendChat(packet);
     }

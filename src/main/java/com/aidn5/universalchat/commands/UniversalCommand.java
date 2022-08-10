@@ -24,7 +24,11 @@ public class UniversalCommand extends CommandBase {
             return;
         }
 
-        if (args[0].equalsIgnoreCase("bridge")) {
+        if (args[0].equalsIgnoreCase("restart")) {
+            s.addChatMessage(getRestartSocket());
+            UniversalChat.socketHook.restartConnection();
+
+        } else if (args[0].equalsIgnoreCase("bridge")) {
             boolean allowed = UniversalChat.socketHook.serviceProvider.hasBridgePermission;
 
             if (allowed) {
@@ -54,6 +58,26 @@ public class UniversalCommand extends CommandBase {
         } else {
             s.addChatMessage(new ChatComponentText(RED + getCommandUsage(s)));
         }
+    }
+
+    private IChatComponent getRestartSocket() {
+        ChatComponentText m = new ChatComponentText(
+                DARK_AQUA + "UniversalChat"
+                        + RESET + " is restarting..."
+                        + GRAY + " (hover here)");
+        ChatStyle cs = new ChatStyle();
+        m.setChatStyle(cs);
+
+        String hoverText = DARK_AQUA + BOLD.toString() + "There are multiple reasons for unresponsiveness:\n"
+                + "1. UniversalChat servers are updating and new features are coming\n"
+                + "2. A slow internet connection is preventing from connecting to servers\n"
+                + "3. Firewall or antivirus is preventing UniversalChat from working\n"
+                + "4. Other mods are conflicted with UniversalChat\n\n"
+                + DARK_GRAY + "If error is not fixed or is re-encountered multiple times, \n"
+                + DARK_GRAY + "please contact admins on the official discord server or in-game via `/msg aidn5`";
+        cs.setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(hoverText)));
+
+        return m;
     }
 
     private IChatComponent getEnableBridge() {
@@ -92,8 +116,8 @@ public class UniversalCommand extends CommandBase {
                 + "by either opening a ticket  on the official discord server\n"
                 + "or by messaging them directly on UniversalChat service.\n\n"
                 + "Note: Guild's Staff or Guild-Master must do the procedure.\n\n"
-                + GRAY + "This procedure is done to prevent random people from abusing\n"
-                + GRAY + "particular permissions.";
+                + DARK_GRAY + "This procedure is done to prevent\n"
+                + DARK_GRAY + "random people from abusing particular permissions.";
         cs.setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(hoverText)));
 
         return m;
