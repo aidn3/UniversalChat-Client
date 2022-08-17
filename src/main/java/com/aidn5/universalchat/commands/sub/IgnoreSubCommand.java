@@ -3,14 +3,12 @@ package com.aidn5.universalchat.commands.sub;
 import com.aidn5.universalchat.UniversalChat;
 import com.aidn5.universalchat.common.MessageUtil;
 import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 
 import java.util.List;
 
 import static net.minecraft.util.EnumChatFormatting.*;
-import static net.minecraft.util.EnumChatFormatting.RED;
 
 public class IgnoreSubCommand extends CommandBase {
     @Override
@@ -24,7 +22,7 @@ public class IgnoreSubCommand extends CommandBase {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+    public void processCommand(ICommandSender sender, String[] args) {
         if (args.length >= 2 && args[0].equalsIgnoreCase("add")) {
             String usernameToIgnore = args[1]; //TODO: add method to sanitize usernames
 
@@ -81,7 +79,10 @@ public class IgnoreSubCommand extends CommandBase {
                 }
             }
 
-            sender.addChatMessage(displayIgnoreList(page));
+            sender.addChatMessage(displayIgnoreList(page - 1)); // pagination index starts from 0
+
+        } else {
+            sender.addChatMessage(new ChatComponentText(RED + getCommandUsage(sender)));
         }
     }
 
@@ -92,18 +93,24 @@ public class IgnoreSubCommand extends CommandBase {
     private ChatComponentText displayIgnoreList(int page) {
         final int PAGE_SIZE = 10;
 
-        int totalPages = UniversalChat.configInstance.ignoreList.size() % PAGE_SIZE;
-        StringBuilder message = new StringBuilder("UChat ignored users (page " + page + " out of " + totalPages + "):\n");
+        List<String> ignoreList = UniversalChat.configInstance.ignoreList;
+        int totalPages = ignoreList.size() / PAGE_SIZE;
+        if (ignoreList.size() % PAGE_SIZE != 0) totalPages++;
+
+        StringBuilder message = new StringBuilder();
+        message.append(AQUA).append("UChat ignored users (page ")
+                .append(page + 1).append(" out of ").append(totalPages)
+                .append("):");
 
         page = Math.abs(page);
         int startIndex = Math.min(page * PAGE_SIZE, UniversalChat.configInstance.ignoreList.size());
         int endIndex = Math.min(page * PAGE_SIZE + PAGE_SIZE, UniversalChat.configInstance.ignoreList.size());
 
         List<String> list = UniversalChat.configInstance.ignoreList.subList(startIndex, endIndex);
-        for (int i = page * PAGE_SIZE; i < list.size(); i++) {
-            message
-                    .append(AQUA).append(startIndex + i).append(". ")
-                    .append(YELLOW).append(list.get(i)).append("\n");
+        for (int i = 0; i < list.size(); i++) {
+            message.append("\n");
+            message.append(AQUA).append(startIndex + i + 1).append(". ");
+            message.append(YELLOW).append(list.get(i));
         }
 
         return new ChatComponentText(message.toString());
