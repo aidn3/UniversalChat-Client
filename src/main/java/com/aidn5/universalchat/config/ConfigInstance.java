@@ -14,7 +14,7 @@ public class ConfigInstance {
     @Nonnull
     public Channel currentChannel = Channel.NONE;
 
-    public boolean showBroadcast = true;
+    public boolean showBroadcastUpdates = true;
 
     public boolean bridgeEnabled = false;
 

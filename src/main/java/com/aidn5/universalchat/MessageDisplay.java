@@ -105,7 +105,10 @@ public class MessageDisplay {
     }
 
     public static void showBroadcastMessage(Broadcast broadcast) {
-        if (!UniversalChat.configInstance.showBroadcast && !broadcast.important) return;
+        if (broadcast.type == Broadcast.Type.UPDATE
+                && !UniversalChat.configInstance.showBroadcastUpdates) return;
+        if (broadcast.type == Broadcast.Type.COMMAND
+                && !UniversalChat.configInstance.showGlobalChat) return;
 
         IChatComponent displayMessage = new ChatComponentText("")
                 .appendSibling(chatPrefix());

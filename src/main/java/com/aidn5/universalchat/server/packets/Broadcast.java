@@ -27,6 +27,26 @@ import java.util.Objects;
  * User chat is separated in MessagePacket.class
  */
 public class Broadcast implements IPacket {
+    public enum Type {
+        /**
+         * Used when a response sent for a command a user executed.
+         * The command-executor could be the user or a random person
+         * connected to same channel.
+         */
+        COMMAND,
+        /**
+         * Used for advertising, mod update notifications, etc.
+         */
+        UPDATE,
+        /**
+         * Important messages that can't be ignored at all.
+         * Usually punishments notifications,
+         * Important status messages,
+         * etc.
+         */
+        IMPORTANT,
+    }
+
     /**
      * The broadcast/message content to display.
      * This can either be plain message or {@link IChatComponent} in json form,
@@ -46,26 +66,19 @@ public class Broadcast implements IPacket {
     public final boolean json;// TODO: fix
 
     /**
-     * Whether the message is of an importance to be displayed and can't be
-     * ignored/toggled.
-     *
-     * <p>
-     * Important Messages like: Mute & Ban Notification, Commands response the
-     * client sent, etc.
-     * <br>
-     * Not-important Messages like: advertising, suggestions messages
+     * Defines the broadcast's priority and whether it is mute-able
      */
-    public final boolean important;
+    public final Type type;
 
 
-    public Broadcast(@Nonnull String message, boolean json, boolean important) {
+    public Broadcast(@Nonnull String message, boolean json, Type type) {
         if (message.isEmpty()) {
             throw new IllegalArgumentException("message is empty");
         }
 
         this.message = Objects.requireNonNull(message);
         this.json = json;
-        this.important = important;
+        this.type = type;
     }
 
     @Override
