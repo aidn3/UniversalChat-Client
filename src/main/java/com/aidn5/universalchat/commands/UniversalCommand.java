@@ -55,9 +55,7 @@ public class UniversalCommand extends CommandBase {
                 s.addChatMessage(MessageUtil.getErrorSavingSettings());
             }
 
-        }
-
-        else if (args[0].equalsIgnoreCase("ignore") && args[1] != null) {
+        } else if (args[0].equalsIgnoreCase("ignore") && args[1] != null) {
             if (!args[1].equalsIgnoreCase("add") && !args[1].equalsIgnoreCase("remove") && !args[1].equalsIgnoreCase("list"))
                 return;
 
@@ -111,12 +109,10 @@ public class UniversalCommand extends CommandBase {
                     e.printStackTrace();
                     s.addChatMessage(MessageUtil.getErrorSavingSettings());
                 }
+            } else if (args[1].equalsIgnoreCase("list")) {
+                s.addChatMessage(displayIgnoreList(0));//TODO: add pagination
             }
-            else if (args[1].equalsIgnoreCase("list")) {
-                s.addChatMessage(displayIgnoreList());
-            }
-        }
-        else {
+        } else {
             s.addChatMessage(new ChatComponentText(RED + getCommandUsage(s)));
         }
     }
@@ -184,23 +180,29 @@ public class UniversalCommand extends CommandBase {
         return m;
     }
 
-    private ChatComponentText displayIgnoreList() {
-        String message;
+    private ChatComponentText displayIgnoreList(int page) {
+        final int PAGE_SIZE = 10;
+
+        StringBuilder message;
         if (UniversalChat.configInstance.ignoreList.size() == 0) {
-            return new ChatComponentText("You don't have anybody ignored.");
+            return new ChatComponentText(YELLOW + "You don't have anybody ignored.");
         }
 
-        message = "Your ignore list consists of: \n[";
-        for (int i = 0; i < UniversalChat.configInstance.ignoreList.size(); i++) {
-            if (i + 1 == UniversalChat.configInstance.ignoreList.size()) {
-                message += GRAY + UniversalChat.configInstance.ignoreList.get(i) + RESET + "]";
-                return new ChatComponentText(message);
-            } else {
-                message += GRAY + UniversalChat.configInstance.ignoreList.get(i) + ", ";
-            }
+        int totalPages = UniversalChat.configInstance.ignoreList.size() % PAGE_SIZE;
+        message = new StringBuilder("UChat ignored users (page " + page + " out of " + totalPages + "):\n");
+
+        page = Math.abs(page);
+        int startIndex = Math.min(page * PAGE_SIZE, UniversalChat.configInstance.ignoreList.size());
+        int endIndex = Math.min(page * PAGE_SIZE + PAGE_SIZE, UniversalChat.configInstance.ignoreList.size());
+
+        List<String> list = UniversalChat.configInstance.ignoreList.subList(startIndex, endIndex);
+        for (int i = page * PAGE_SIZE; i < list.size(); i++) {
+            message
+                    .append(AQUA).append(startIndex + i).append(". ")
+                    .append(YELLOW).append(list.get(i)).append("\n");
         }
 
-        return new ChatComponentText(message);
+        return new ChatComponentText(message.toString());
     }
 
     private ChatComponentText ignoreListAdd(String player) {
