@@ -2,6 +2,7 @@ package com.aidn5.universalchat.commands.sub;
 
 import com.aidn5.universalchat.UniversalChat;
 import com.aidn5.universalchat.common.MessageUtil;
+import com.aidn5.universalchat.common.Player;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
@@ -24,7 +25,13 @@ public class IgnoreSubCommand extends CommandBase {
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
         if (args.length >= 2 && args[0].equalsIgnoreCase("add")) {
-            String usernameToIgnore = args[1]; //TODO: add method to sanitize usernames
+            final String usernameToIgnore;
+            try {
+                usernameToIgnore = Player.validateUsername(args[1]);
+            } catch (Player.NotValidUsername e) {
+                sender.addChatMessage(new ChatComponentText(RED + e.getMessage()));
+                return;
+            }
 
             for (String ignoredUsername : UniversalChat.configInstance.ignoreList) {
                 if (usernameToIgnore.equalsIgnoreCase(ignoredUsername)) {
@@ -43,7 +50,13 @@ public class IgnoreSubCommand extends CommandBase {
             }
 
         } else if (args.length >= 2 && args[0].equalsIgnoreCase("remove")) {
-            String usernameToIgnore = args[1]; //TODO: add method to sanitize usernames
+            final String usernameToIgnore;
+            try {
+                usernameToIgnore = Player.validateUsername(args[1]);
+            } catch (Player.NotValidUsername e) {
+                sender.addChatMessage(new ChatComponentText(RED + e.getMessage()));
+                return;
+            }
 
             List<String> ignoreList = UniversalChat.configInstance.ignoreList;
             for (int i = 0; i < ignoreList.size(); i++) {
