@@ -1,9 +1,11 @@
 package com.aidn5.universalchat.commands;
 
 import com.aidn5.universalchat.UniversalChat;
+import com.aidn5.universalchat.commands.sub.IgnoreSubCommand;
 import com.aidn5.universalchat.common.MessageUtil;
 import com.google.common.collect.Lists;
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.event.HoverEvent;
 import net.minecraft.util.ChatComponentText;
@@ -11,6 +13,7 @@ import net.minecraft.util.ChatStyle;
 import net.minecraft.util.IChatComponent;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import static net.minecraft.util.EnumChatFormatting.*;
@@ -18,7 +21,7 @@ import static net.minecraft.util.EnumChatFormatting.*;
 public class UniversalCommand extends CommandBase {
 
     @Override
-    public void processCommand(ICommandSender s, String[] args) {
+    public void processCommand(ICommandSender s, String[] args) throws CommandException {
         if (args.length == 0) {
             s.addChatMessage(new ChatComponentText(RED + getCommandUsage(s)));
             return;
@@ -54,6 +57,9 @@ public class UniversalCommand extends CommandBase {
                 e.printStackTrace();
                 s.addChatMessage(MessageUtil.getErrorSavingSettings());
             }
+
+        } else if (args[0].equalsIgnoreCase("ignore")) {
+            new IgnoreSubCommand().processCommand(s, Arrays.copyOfRange(args, 1, args.length));
 
         } else {
             s.addChatMessage(new ChatComponentText(RED + getCommandUsage(s)));
