@@ -1,5 +1,5 @@
 
-package com.aidn5.universalchat.commands;
+package com.aidn5.universalchat.channel;
 
 import com.aidn5.universalchat.UniversalChat;
 import com.aidn5.universalchat.common.Channel;

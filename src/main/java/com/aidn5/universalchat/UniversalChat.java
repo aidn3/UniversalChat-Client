@@ -2,8 +2,11 @@
 package com.aidn5.universalchat;
 
 import com.aidn5.universalchat.bridge.GuildBridge;
-import com.aidn5.universalchat.commands.ChatCommand;
-import com.aidn5.universalchat.commands.MessageCommand;
+import com.aidn5.universalchat.channel.ChatCommand;
+import com.aidn5.universalchat.channel.ChatDetectChannel;
+import com.aidn5.universalchat.channel.MessageCommand;
+import com.aidn5.universalchat.channel.ReplyCommand;
+import com.aidn5.universalchat.commands.SendCommand;
 import com.aidn5.universalchat.commands.UniversalCommand;
 import com.aidn5.universalchat.config.ConfigInstance;
 import com.aidn5.universalchat.config.ConfigUtil;
@@ -43,8 +46,13 @@ public class UniversalChat {
 
         MinecraftForge.EVENT_BUS.register(new GuildBridge());
 
+        ClientCommandHandler.instance.registerCommand(new SendCommand());
+        ClientCommandHandler.instance.registerCommand(new UniversalCommand());
+
+
+        MinecraftForge.EVENT_BUS.register(new ChatDetectChannel());
+        ClientCommandHandler.instance.registerCommand(new ReplyCommand());
         ClientCommandHandler.instance.registerCommand(new MessageCommand());
         ClientCommandHandler.instance.registerCommand(new ChatCommand());
-        ClientCommandHandler.instance.registerCommand(new UniversalCommand());
     }
 }

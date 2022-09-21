@@ -15,7 +15,7 @@ public class MessageUtil {
         message.setChatStyle(cs);
 
         cs.setColor(RED);
-        String hover = GRAY + "Using \"/chat\" command will by default fall back to hypixel channels";
+        String hover = GRAY + "Using this command will by default fall back to server channels";
         cs.setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(hover)));
         return message;
     }

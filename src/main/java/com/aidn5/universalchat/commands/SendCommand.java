@@ -15,7 +15,7 @@ import java.util.List;
 
 import static net.minecraft.util.EnumChatFormatting.*;
 
-public class MessageCommand extends CommandBase {
+public class SendCommand extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender s, String[] args) {
