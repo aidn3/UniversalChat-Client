@@ -79,4 +79,7 @@ shadowJar {
     exclude('module-info.class')
     exclude('META-INF/versions/')
     relocate 'io.socket', 'com.aidn5.universalchat.shadow.io.socket'
+    relocate 'okhttp3', 'com.aidn5.universalchat.shadow.okhttp3'
+    relocate 'okio', 'com.aidn5.universalchat.shadow.okio'
+    relocate 'org.json', 'com.aidn5.universalchat.shadow.org.json'
 }
