@@ -30,7 +30,7 @@ minecraft {
 }
 
 dependencies {
-    compile 'io.socket:socket.io-client:2.0.1'
+    compile 'io.socket:socket.io-client:2.1.0'
 
 }
 
@@ -82,4 +82,8 @@ shadowJar {
     relocate 'okhttp3', 'com.aidn5.universalchat.shadow.okhttp3'
     relocate 'okio', 'com.aidn5.universalchat.shadow.okio'
     relocate 'org.json', 'com.aidn5.universalchat.shadow.org.json'
+}
+
+repositories {
+    mavenCentral()
 }
