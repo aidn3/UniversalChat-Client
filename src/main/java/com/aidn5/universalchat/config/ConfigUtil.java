@@ -3,6 +3,7 @@ package com.aidn5.universalchat.config;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +20,16 @@ public class ConfigUtil {
 
         if (Files.isFile().apply(file)) {
             String json = Files.toString(file, StandardCharsets.UTF_8);
-            config = ConfigGsonBuilder.fromJson(json, ConfigInstance.class);
+            try {
+                config = ConfigGsonBuilder.fromJson(json, ConfigInstance.class);
+            } catch (JsonSyntaxException e) {
+                System.err.println("Json file is corrupted. " +
+                        "to avoid crash, new file is created. " +
+                        "This probably happened because of settings compatibility issue in different versions of the mod ");
+
+                config = new ConfigInstance();
+                saveConfig(file, config);
+            }
 
         } else {
             config = new ConfigInstance();
