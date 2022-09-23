@@ -21,6 +21,16 @@ public class ConfigInstance {
 
     public ArrayList<String> ignoreList = new ArrayList<>();
 
+    public boolean onIgnoreList(String username) {
+        for (String s : ignoreList) {
+            if (username.equalsIgnoreCase(s)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void save() throws IOException {
         ConfigUtil.saveConfig(configPath, this);
     }

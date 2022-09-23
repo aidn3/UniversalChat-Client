@@ -28,6 +28,7 @@ public class GuildBridge {
         String message = matcher.group(2).trim();
 
         if (message.startsWith(BRIDGE_INDICATOR)) return;
+        if (UniversalChat.configInstance.onIgnoreList(username)) return;
 
         String bridgeName = Minecraft.getMinecraft().thePlayer.getName();
         Message packet = new Message(bridgeName, username, message, true);
@@ -41,6 +42,8 @@ public class GuildBridge {
         EntityPlayerSP p = Minecraft.getMinecraft().thePlayer;
         if (p != null) {
             String username = message.displayName != null ? message.displayName : message.username;
+            if (UniversalChat.configInstance.onIgnoreList(username)) return;
+
             String finalMessage = "/gc " + BRIDGE_INDICATOR + username + ": " + message.message;
             p.sendChatMessage(finalMessage);
         }
