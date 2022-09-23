@@ -3,7 +3,6 @@ package com.aidn5.universalchat.commands.sub;
 import com.aidn5.universalchat.UniversalChat;
 import com.aidn5.universalchat.common.MessageUtil;
 import com.aidn5.universalchat.common.Player;
-import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 
@@ -11,7 +10,7 @@ import java.util.List;
 
 import static net.minecraft.util.EnumChatFormatting.*;
 
-public class IgnoreSubCommand extends CommandBase {
+public class IgnoreSubCommand extends ISubCommand {
     @Override
     public String getCommandName() {
         return "ignore";
@@ -19,7 +18,7 @@ public class IgnoreSubCommand extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "ignore <add/remove/list>";
+        return "<add/remove/list> [username]";
     }
 
     @Override
@@ -147,5 +146,10 @@ public class IgnoreSubCommand extends CommandBase {
     private ChatComponentText playerNotInTheIgnoreList(String player) {
         String message = RED + player + " is not in the ignore list!";
         return new ChatComponentText(message);
+    }
+
+    @Override
+    public String getCommandDescription() {
+        return "Ignore people from UChat service.";
     }
 }

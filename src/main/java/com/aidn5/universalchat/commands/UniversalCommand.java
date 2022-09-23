@@ -1,147 +1,93 @@
 package com.aidn5.universalchat.commands;
 
-import com.aidn5.universalchat.UniversalChat;
+import com.aidn5.universalchat.commands.sub.BridgeSubCommand;
+import com.aidn5.universalchat.commands.sub.ISubCommand;
 import com.aidn5.universalchat.commands.sub.IgnoreSubCommand;
-import com.aidn5.universalchat.common.MessageUtil;
+import com.aidn5.universalchat.commands.sub.RestartSubCommand;
 import com.google.common.collect.Lists;
+import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatStyle;
 import net.minecraft.util.IChatComponent;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import static net.minecraft.util.EnumChatFormatting.*;
+import static net.minecraft.util.EnumChatFormatting.RED;
 
 public class UniversalCommand extends CommandBase {
 
+    private final ISubCommand[] subCommands = new ISubCommand[]{
+            new IgnoreSubCommand(),
+            new RestartSubCommand(),
+            new BridgeSubCommand()
+    };
+
     @Override
-    public void processCommand(ICommandSender s, String[] args) throws CommandException {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if (args.length == 0) {
-            s.addChatMessage(new ChatComponentText(RED + getCommandUsage(s)));
+            sender.addChatMessage(new ChatComponentText(RED + getCommandUsage(sender)));
+            return;
+
+        } else if (args[0].equalsIgnoreCase("help")) {
+            sender.addChatMessage(getDetailedHelp(sender));
             return;
         }
 
-        if (args[0].equalsIgnoreCase("restart")) {
-            s.addChatMessage(getRestartSocket());
-            UniversalChat.socketHook.restartConnection();
+        String commandName = args[0];
+        String[] subCommandArgs = Arrays.copyOfRange(args, 1, args.length);
+        Optional<ISubCommand> command = Arrays.stream(subCommands)
+                .filter(c -> c.getCommandName().equalsIgnoreCase(commandName))
+                .findFirst();
 
-        } else if (args[0].equalsIgnoreCase("bridge")) {
-            boolean allowed = UniversalChat.socketHook.serviceProvider.hasBridgePermission;
-
-            if (allowed) {
-                UniversalChat.configInstance.bridgeEnabled = !UniversalChat.configInstance.bridgeEnabled;
-
-                s.addChatMessage(UniversalChat.configInstance.bridgeEnabled
-                        ? getEnableBridge()
-                        : getDisableBridge());
-
-            } else {
-                s.addChatMessage(getBridgeNotAllowed());
-
-                if (UniversalChat.configInstance.bridgeEnabled) {
-                    s.addChatMessage(getForceDisableBridge());
-                }
-
-                UniversalChat.configInstance.bridgeEnabled = false;
-            }
-
-            try {
-                UniversalChat.configInstance.save();
-            } catch (IOException e) {
-                e.printStackTrace();
-                s.addChatMessage(MessageUtil.getErrorSavingSettings());
-            }
-
-        } else if (args[0].equalsIgnoreCase("ignore")) {
-            new IgnoreSubCommand().processCommand(s, Arrays.copyOfRange(args, 1, args.length));
+        if (command.isPresent()) {
+            command.get().processCommand(sender, subCommandArgs);
 
         } else {
-            s.addChatMessage(new ChatComponentText(RED + getCommandUsage(s)));
+            sender.addChatMessage(new ChatComponentText(RED + getCommandUsage(sender)));
         }
     }
 
-    private IChatComponent getRestartSocket() {
-        ChatComponentText m = new ChatComponentText(
-                DARK_AQUA + "UniversalChat"
-                        + RESET + " is restarting..."
-                        + GRAY + " (hover here)");
-        ChatStyle cs = new ChatStyle();
-        m.setChatStyle(cs);
+    private ChatComponentText getDetailedHelp(ICommandSender sender) {
+        ChatComponentText helpMessage = new ChatComponentText("");
 
-        String hoverText = DARK_AQUA + BOLD.toString() + "There are multiple reasons for unresponsiveness:\n"
-                + "1. UniversalChat servers are updating and new features are coming\n"
-                + "2. A slow internet connection is preventing from connecting to servers\n"
-                + "3. Firewall or antivirus is preventing UniversalChat from working\n"
-                + "4. Other mods are conflicted with UniversalChat\n\n"
-                + DARK_GRAY + "If error is not fixed or is re-encountered multiple times, \n"
-                + DARK_GRAY + "please contact admins on the official discord server or in-game via `/msg aidn5`";
-        cs.setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(hoverText)));
+        helpMessage.appendText(ChatFormatting.RED
+                + ChatFormatting.BOLD.toString()
+                + "UniversalChat help page:");
 
-        return m;
-    }
+        for (ISubCommand command : subCommands) {
+            helpMessage.appendText("\n");
 
-    private IChatComponent getEnableBridge() {
-        ChatComponentText m = new ChatComponentText(
-                DARK_AQUA + "UniversalChat"
-                        + RESET + " GuildBridge-Mode has been " + GREEN + "enabled" + RESET + "!"
-                        + GRAY + " (hover here)");
-        ChatStyle cs = new ChatStyle();
-        m.setChatStyle(cs);
+            IChatComponent subHelp = new ChatComponentText("")
+                    .appendText(ChatFormatting.RED + "/" + getCommandName()
+                            + " " + command.getCommandName()
+                            + " " + command.getCommandUsage(sender));
 
-        String hoverText = DARK_AQUA + BOLD.toString() + "UniversalChat GuildBridge-Mode\n"
-                + "On this mode, all guild chats are shared with UniversalChat service\n"
-                + "linking everyone together!\n\n"
-                + RED + BOLD + "As the owner of the bridge,\n"
-                + RED + BOLD + "make sure to moderate your guild and prevent abuse from occurring.\n"
-                + RED + BOLD + "Failing in fulfilling this role may result in ban.";
-        cs.setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(hoverText)));
+            ChatComponentText hoverMessage = new ChatComponentText(command.getCommandDescription());
+            subHelp.getChatStyle()
+                    .setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverMessage))
+                    .setChatClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+                            "/" + getCommandName() + " " + command.getCommandName() + " "));
 
-        return m;
-    }
+            helpMessage.appendSibling(subHelp);
+        }
 
-    private ChatComponentText getDisableBridge() {
-        return new ChatComponentText("Universal chat's GuildBridge-Mode has been " + RED + "disabled");
-    }
-
-    private ChatComponentText getBridgeNotAllowed() {
-        ChatComponentText m = new ChatComponentText(
-                DARK_AQUA + "UniversalChat"
-                        + RED + " GuildBridge-Mode requires a permission from UniversalChat admins!"
-                        + GRAY + " (hover here)");
-        ChatStyle cs = new ChatStyle();
-        m.setChatStyle(cs);
-
-        String hoverText = DARK_AQUA + BOLD.toString() + "UniversalChat GuildBridge-Mode\n"
-                + "Contact UniversalChat Staff or Admins\n"
-                + "by either opening a ticket  on the official discord server\n"
-                + "or by messaging them directly on UniversalChat service.\n\n"
-                + "Note: Guild's Staff or Guild-Master must do the procedure.\n\n"
-                + DARK_GRAY + "This procedure is done to prevent\n"
-                + DARK_GRAY + "random people from abusing particular permissions.";
-        cs.setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(hoverText)));
-
-        return m;
-    }
-
-    private ChatComponentText getForceDisableBridge() {
-        String message = RED + "Bridge-mode was enabled. Disabling it...";
-        return new ChatComponentText(message);
+        return helpMessage;
     }
 
     @Override
     public List<String> getCommandAliases() {
-        return Lists.asList("u", new String[0]);
+        return Lists.asList("universal", new String[]{"uchat"});
     }
 
     @Override
     public String getCommandName() {
-        return "universal";
+        return "u";
     }
 
     @Override
