@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 
 public class GuildBridge {
     private static final Pattern PUBLIC_CHAT = Pattern.compile("^Guild > (?:\\[[A-Z+]{1,10}\\] ){0,3}(\\w{3,32})(?: \\[\\w{1,10}\\]){0,3}:(.{1,256})");
+
+    //TODO: integrate it into the regex or correct com.aidn5.universalchat.bridge.GuildChatCompactor regex
     private static final String BRIDGE_INDICATOR = ".";
 
     @SubscribeEvent

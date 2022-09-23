@@ -31,16 +31,16 @@ public class MessageDisplay {
         return m;
     }
 
-    private static ChatComponentText displayName(Message event) {
-        if (event.displayName == null || event.displayName.isEmpty()) {
-            return new ChatComponentText(GOLD + event.username);
+    public static ChatComponentText displayName(String senderName, String displayName) {
+        if (displayName == null || displayName.isEmpty()) {
+            return new ChatComponentText(GOLD + senderName);
         }
 
-        ChatComponentText m = new ChatComponentText(GOLD + "." + event.displayName);
+        ChatComponentText m = new ChatComponentText(GOLD + "." + displayName);
         ChatStyle cs = new ChatStyle();
         m.setChatStyle(cs);
 
-        String hoverText = event.username + " is sending this message.\n"
+        String hoverText = senderName + " is sending this message.\n"
                 + DARK_GRAY + "This message is mostly sent from a guild-bridge";
         cs.setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(hoverText)));
 
@@ -50,7 +50,7 @@ public class MessageDisplay {
     // https://superuser.com/a/623174
     private final static Pattern LINK_REGEX = Pattern.compile("(https?):\\/\\/[a-z0-9\\.:].*?(?=\\s)");
 
-    private static ArrayList<ChatComponentText> formatMessage(String message) {
+    public static ArrayList<ChatComponentText> formatMessage(String message) {
         /*
           Due to a bug in regex pattern LINK_REGEX,
           link isn't detected if it is at the end of a message
@@ -101,7 +101,7 @@ public class MessageDisplay {
 
         IChatComponent displayMessage = new ChatComponentText("")
                 .appendSibling(chatPrefix())
-                .appendSibling(displayName(event))
+                .appendSibling(displayName(event.username, event.displayName))
                 .appendText(": ");
 
         formatMessage(event.message).forEach(displayMessage::appendSibling);
@@ -123,7 +123,7 @@ public class MessageDisplay {
         display(displayMessage);
     }
 
-    private static void display(IChatComponent component) {
+    public static void display(IChatComponent component) {
         EntityPlayerSP p = Minecraft.getMinecraft().thePlayer;
         if (p != null) {
             p.addChatComponentMessage(component);
