@@ -16,6 +16,9 @@ import javax.annotation.Nullable;
  * @author aidn5
  */
 public class Session implements IPacket {
+    /**
+     * Private key to later use to connect to UChat servers
+     */
     @Nullable
     public final String key;
 
